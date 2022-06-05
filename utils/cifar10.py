@@ -3,7 +3,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import torchvision.datasets as dsets
 from .randaugment import RandomAugment
-from .utils_algo import generate_uniform_cv_candidate_labels
+from .utils_algo import generate_uniform_cv_candidate_labels, generate_complementary_labels
 
 def load_cifar10(partial_rate, batch_size):
     test_transform = transforms.Compose(
@@ -18,8 +18,11 @@ def load_cifar10(partial_rate, batch_size):
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size*4, shuffle=False, num_workers=4,
         sampler=torch.utils.data.distributed.DistributedSampler(test_dataset, shuffle=False))
     # set test dataloader
-    
-    partialY = generate_uniform_cv_candidate_labels(labels, partial_rate)
+    if 1:
+        partialY = generate_complementary_labels(labels)
+    else:
+        partialY = generate_uniform_cv_candidate_labels(labels, partial_rate) 
+    # change to all label can be true
     # generate partial labels
     temp = torch.zeros(partialY.shape)
     temp[torch.arange(partialY.shape[0]), labels] = 1

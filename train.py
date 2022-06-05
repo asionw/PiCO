@@ -99,6 +99,7 @@ parser.add_argument('--partial_rate', default=0.1, type=float,
                     help='ambiguity level (q)')
 parser.add_argument('--hierarchical', action='store_true', 
                     help='for CIFAR-100 fine-grained training')
+parser.add_argument('--explore', action='store_true', help='explore for label noise setting')
 
 def main():
     args = parser.parse_args()

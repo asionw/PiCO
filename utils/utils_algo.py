@@ -111,6 +111,29 @@ def cosine_rampdown(current, rampdown_length):
     assert 0 <= current <= rampdown_length
     return float(.5 * (np.cos(np.pi * current / rampdown_length) + 1))
 
+def generate_complementary_labels(true_labels):
+
+    if torch.min(true_labels) > 1:
+        raise RuntimeError('testError')
+    elif torch.min(true_labels) == 1:
+        train_labels = train_labels - 1
+
+    K = int(torch.max(true_labels) - torch.min(true_labels) + 1)
+    
+    candidates = np.arange(K)
+    candidates = np.repeat(candidates.reshape(1,K), len(true_labels), axis = 0)
+    mask = np.ones((len(true_labels), K), dtype=bool)
+    mask[range(len(true_labels)), true_labels.numpy()] = False
+    candidates_ = candidates[mask].reshape(len(true_labels), K-1)
+    idx = np.random.randint(0, K-1, len(true_labels))
+    complementary_labels = candidates_[range(len(true_labels)), idx]
+
+    partialY = torch.ones((len(true_labels), K))
+    partialY[range(len(true_labels)), complementary_labels] = 0
+    return partialY
+
+
+
 def generate_uniform_cv_candidate_labels(train_labels, partial_rate=0.1):
     if torch.min(train_labels) > 1:
         raise RuntimeError('testError')
